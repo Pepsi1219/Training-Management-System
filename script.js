@@ -253,11 +253,11 @@ function updateRecord() {
       savedAt: new Date().toLocaleString('th-TH') + ' (แก้ไข)'
     };
   }
-
+  const today = new Date().toISOString().split('T')[0];
   // Reset form & button
   document.getElementById('topic').value = '';
   document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('startTime').value = '09:00';
+  document.getElementById('startTime').value = '08:00';
   document.getElementById('endDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('endTime').value = '17:00';
   document.getElementById('location').value = '';
@@ -405,9 +405,9 @@ function startEdit(logNo) {
   // โหลดข้อมูลเข้า form
   document.getElementById('topic').value = log.topic;
   document.getElementById('startDate').value = log.startDate;
-document.getElementById('startTime').value = log.startTime;
-document.getElementById('endDate').value   = log.endDate;
-document.getElementById('endTime').value   = log.endTime;
+  document.getElementById('startTime').value = log.startTime;
+  document.getElementById('endDate').value   = log.endDate;
+  document.getElementById('endTime').value   = log.endTime;
   document.getElementById('location').value = log.location;
   selectedEmployees = [...log.employees];
   renderTags();
@@ -419,4 +419,27 @@ document.getElementById('endTime').value   = log.endTime;
   document.querySelector('.btn-primary').textContent = 'อัปเดตข้อมูลการอบรม';
   document.querySelector('.btn-primary').onclick = updateRecord;  // เปลี่ยน event
 }
-        
+// ─────────────────────────────────────────
+// INIT - ตั้งค่าเริ่มต้นฟอร์มตอนโหลดหน้าเว็บ
+// ─────────────────────────────────────────
+function resetForm() {
+  const today = new Date().toISOString().split('T')[0];
+  
+  document.getElementById('topic').value = '';
+  document.getElementById('startDate').value = today;
+  document.getElementById('startTime').value = '09:00';
+  document.getElementById('endDate').value   = today;
+  document.getElementById('endTime').value   = '17:00';
+  document.getElementById('location').value = '';
+  selectedEmployees = [];
+  renderTags();
+}
+
+// เรียกใช้ตอนโหลดหน้า
+resetForm();   // ← เพิ่มบรรทัดนี้ท้าย script
+
+// ใน saveRecord() และ updateRecord() เรียก resetForm() แทน reset แบบ manual
+// เช่น ใน saveRecord() หลังบันทึก ให้แทนที่ส่วน reset ด้วย:
+resetForm();
+renderLogs();
+showToast(`บันทึก LOG #${logNo} สำเร็จแล้ว`);
