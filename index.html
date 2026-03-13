@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Management System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast">
+  <div class="toast-icon">✓</div>
+  <span id="toast-msg">บันทึกข้อมูลสำเร็จ</span>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent">
+    <div class="modal-title">
+      <span id="modal-log-no">LOG #001</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">Training Management System</div>
+    <h1>บันทึกการฝึกอบรม</h1>
+    <p>จัดการข้อมูลการฝึกอบรมพนักงาน</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" id="tab-form" onclick="switchTab('form')">บันทึกข้อมูล</div>
+    <div class="tab" id="tab-log" onclick="switchTab('log')">ประวัติการอบรม</div>
+  </div>
+
+  <!-- ═══════════════ FORM TAB ═══════════════ -->
+  <div id="view-form">
+
+    <div class="card">
+  <div class="card-title">ข้อมูลการฝึกอบรม</div>
+  <div class="field-group">
+    <label class="field-label">หัวข้ออบรม</label>
+    <div class="select-wrapper">
+      <select class="glass-select" id="topic">
+  <option value="">— เลือกหัวข้ออบรม —</option>
+  <option>TN-01-00-26 - Industrial Engineering for Apparel Manufacturing</option>
+  <option>TN-02-00-26 - Work Study and Method Analysis</option>
+  <option>TN-03-00-26 - Motion Economy and Workplace Design</option>
+  <option>TN-04-00-26 - Production Planning and Control (PPC)</option>
+  <option>TN-05-00-26 - Line Balancing and Capacity Planning</option>
+  <option>TN-06-00-26 - Time and Motion Study Techniques</option>
+  <option>TN-07-00-26 - Manufacturing Process Flow Optimization</option>
+  <option>TN-08-00-26 - Lean Six Sigma in Garment Industry (Yellow Belt)</option>
+  <option>TN-09-00-26 - Kaizen and Continuous Improvement</option>
+  <option>TN-10-00-26 - Overall Equipment Effectiveness (OEE) in Sewing Lines</option>
+  <option>TN-11-00-26 - Quality Assurance (QA) Systems and Standards (ISO 9001)</option>
+  <option>TN-12-00-26 - Total Quality Management (TQM) for Textiles</option>
+  <option>TN-13-00-26 - In-Process Quality Control (IPQC) and AQL Standards</option>
+  <option>TN-14-00-26 - Root Cause Analysis and Problem Solving (7 QC Tools)</option>
+  <option>TN-15-00-26 - Sewing Defect Analysis and Prevention</option>
+  <option>TN-16-00-26 - Inspection Techniques for Garments (Final/Random)</option>
+  <option>TN-17-00-26 - Statistical Process Control (SPC) in Manufacturing</option>
+  <option>TN-18-00-26 - Supplier Quality Management (SQM)</option>
+  <option>TN-19-00-26 - Internal Audit Techniques for QA/QC</option>
+  <option>TN-20-00-26 - Customer Quality Requirements</option>
+</select>
+        </div>
+      </div>
+
+      <div class="row-2">
+    <div class="field-group">
+      <label class="field-label">วันที่เริ่ม</label>
+      <input type="date" class="glass-input" id="startDate" required>
+    </div>
+    <div class="field-group">
+      <label class="field-label">เวลาเริ่ม</label>
+      <input type="time" class="glass-input" id="startTime" value="09:00" required>
+    </div>
+  </div>
+
+  <div class="row-2">
+    <div class="field-group">
+      <label class="field-label">วันที่เสร็จ</label>
+      <input type="date" class="glass-input" id="endDate" required>
+    </div>
+    <div class="field-group">
+      <label class="field-label">เวลาเสร็จ</label>
+      <input type="time" class="glass-input" id="endTime" value="17:00" required>
+    </div>
+  </div>
+
+      <div class="field-group">
+    <label class="field-label">สถานที่</label>
+    <div class="select-wrapper">
+      <select class="glass-select" id="location">
+        <option value="">— เลือกสถานที่ —</option>
+            <option>ห้องประชุม A (อาคาร 1 ชั้น 3)</option>
+            <option>ห้องประชุม B (อาคาร 1 ชั้น 4)</option>
+            <option>ห้องอบรม Training Room 1</option>
+            <option>ห้องอบรม Training Room 2</option>
+            <option>ออนไลน์ผ่าน Microsoft Teams</option>
+            <option>ออนไลน์ผ่าน Zoom</option>
+            <option>ศูนย์ฝึกอบรมภายนอก</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">ผู้เข้าอบรม</div>
+
+      <div class="field-group search-container">
+        <label class="field-label">ค้นหาพนักงาน (รหัส / ชื่อ)</label>
+        <input
+          type="text"
+          class="glass-input"
+          id="empSearch"
+          placeholder="พิมพ์รหัสพนักงาน หรือชื่อ..."
+          autocomplete="off"
+          oninput="filterEmployees()"
+          onfocus="showDropdown()"
+          onblur="setTimeout(hideDropdown, 200)"
+        >
+        <div class="employee-dropdown" id="empDropdown"></div>
+      </div>
+
+      <div class="selected-tags" id="selectedTags"></div>
+    </div>
+
+    <button class="btn-primary" onclick="saveRecord()">บันทึกข้อมูลการอบรม</button>
+  </div>
+
+  <!-- ═══════════════ LOG TAB ═══════════════ -->
+  <div id="view-log" style="display:none;">
+    <div class="card">
+      <div class="card-title">ประวัติการบันทึก</div>
+      <div id="logList">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <div style="font-size:15px;font-weight:500;">ยังไม่มีข้อมูลการอบรม</div>
+          <div style="font-size:13px;margin-top:6px;color:var(--text-tertiary);">บันทึกข้อมูลในแท็บ "บันทึกข้อมูล"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ปุ่ม Edit/Delete -->
+<div id="confirmDeleteModal">
+  <div class="confirm-box">
+    <div class="confirm-title">ยืนยันการลบ</div>
+    <div class="confirm-text" id="confirmText">คุณแน่ใจหรือไม่ที่จะลบ LOG #XXX ? การกระทำนี้ไม่สามารถกู้คืนได้</div>
+    <div class="confirm-buttons">
+      <button class="btn-cancel" onclick="cancelDelete()">ยกเลิก</button>
+      <button class="btn-delete" onclick="confirmDelete()">ลบ</button>
+    </div>
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
