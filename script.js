@@ -96,24 +96,32 @@ function formatDateRange(start, end) {
    EMPLOYEE SEARCH
 ───────────────────────────────────────── */
 function filterEmployees() {
-  const q = document.getElementById('empSearch').value.toLowerCase();
+  const input = document.getElementById('empSearch');
+  const q = input.value.toLowerCase().trim();
   const dd = document.getElementById('empDropdown');
+
+  // ล้างเนื้อหาเก่าก่อน
+  dd.innerHTML = '';
+
   if (!q) {
-    dd.innerHTML = '';
     dd.classList.remove('show');
     return;
   }
+
+  // กรองพนักงานที่ยังไม่ถูกเลือก
   const filtered = EMPLOYEES.filter(e =>
     (e.id.toLowerCase().includes(q) || e.name.toLowerCase().includes(q)) &&
-    !selectedEmployees.find(s => s.id === e.id)
-  ).slice(0, 8);
+    !selectedEmployees.some(s => s.id === e.id)
+  ).slice(0, 10);
+
   if (!filtered.length) {
     dd.innerHTML = '<div style="padding:14px;text-align:center;font-size:13px;color:var(--text-secondary);">ไม่พบพนักงาน</div>';
     dd.classList.add('show');
     return;
   }
+
   dd.innerHTML = filtered.map(e => `
-    <div class="emp-item" onmousedown="selectEmployee('${e.id}')">
+    <div class="emp-item" onclick="event.stopPropagation(); selectEmployee('${e.id}')" style="cursor:pointer;">
       <div class="emp-avatar">${getInitials(e.name)}</div>
       <div class="emp-info">
         <div class="emp-name">${e.name}</div>
@@ -121,31 +129,41 @@ function filterEmployees() {
       </div>
     </div>
   `).join('');
+
   dd.classList.add('show');
 }
 
+// เมื่อพิมพ์ในช่องค้นหา → แสดง/อัปเดต dropdown ทันที
 function showDropdown() {
-  if (document.getElementById('empSearch').value) filterEmployees();
-}
-
-function hideDropdown() {
-  document.getElementById('empDropdown').classList.remove('show');
+  filterEmployees();
 }
 
 function selectEmployee(id) {
   const emp = EMPLOYEES.find(e => e.id === id);
-  if (!emp || selectedEmployees.find(e => e.id === id)) return;
+  if (!emp || selectedEmployees.some(e => e.id === id)) return;
+
   selectedEmployees.push(emp);
-  document.getElementById('empSearch').value = '';
-  document.getElementById('empDropdown').classList.remove('show');
   renderTags();
+
+  // โฟกัสกลับไปที่ช่องค้นหาเพื่อพิมพ์ต่อได้เลย
+  document.getElementById('empSearch').focus();
+
+  // อัปเดต dropdown ทันที (ซ่อนคนที่เพิ่งเลือกออก)
+  filterEmployees();
+
+  // สำคัญ: ไม่ปิด dropdown
 }
 
+// ลบพนักงานออกจากรายการที่เลือก
 function removeEmployee(id) {
   selectedEmployees = selectedEmployees.filter(e => e.id !== id);
   renderTags();
+
+  // อัปเดต dropdown ใหม่ (แสดงคนที่เพิ่งลบออกมาอีกครั้ง)
+  filterEmployees();
 }
 
+// แสดง tag ผู้เข้าอบรม
 function renderTags() {
   const container = document.getElementById('selectedTags');
   if (!selectedEmployees.length) {
@@ -159,6 +177,29 @@ function renderTags() {
     </div>
   `).join('');
 }
+
+// จัดการคลิกนอกเพื่อปิด dropdown - แต่ต้องไม่ปิดทันทีเมื่อคลิกที่ emp-item
+document.addEventListener('click', function(e) {
+  const searchContainer = document.querySelector('.search-container');
+  const dropdown = document.getElementById('empDropdown');
+  
+  // ถ้าคลิกที่ emp-item อย่าเพิ่งปิด
+  if (e.target.closest('.emp-item')) {
+    return;
+  }
+  
+  // ถ้าคลิกนอก search container ให้ปิด dropdown
+  if (!searchContainer.contains(e.target)) {
+    dropdown.classList.remove('show');
+  }
+});
+
+// กด Esc เพื่อปิด dropdown
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('empDropdown').classList.remove('show');
+  }
+});
 
 /* ─────────────────────────────────────────
    TOAST
