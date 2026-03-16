@@ -425,7 +425,7 @@
     font-size: 14px;
     color: var(--text-primary);
   }
-
+  /* ─── กล่องประวัติ ─── */
   .attendee-chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .attendee-chip {
     background: rgba(0,0,0,0.06);
