@@ -335,15 +335,15 @@ function renderLogs() {
   }
 
   container.innerHTML = logs.map(log => `
-    <div class="log-item">
+    <div class="log-item" onclick="viewLog('${log.logNo}')">
       <div class="log-header">
         <div>
           <div class="log-no">LOG #${log.logNo}</div>
           <div class="log-date">${formatDateRange(log.startDate, log.endDate)}</div>
         </div>
         <div class="log-actions">
-          <button class="action-btn" onclick="startEdit('${log.logNo}')">✏️</button>
-          <button class="action-btn delete" onclick="requestDelete('${log.logNo}')">🗑️</button>
+          <button class="action-btn" onclick="event.stopPropagation(); startEdit('${log.logNo}')">✏️</button>
+          <button class="action-btn delete" onclick="event.stopPropagation(); requestDelete('${log.logNo}')">🗑️</button>
         </div>
       </div>
       <div class="log-topic">${log.topic}</div>
@@ -472,3 +472,20 @@ function startEdit(logNo) {
 ───────────────────────────────────────── */
 resetForm();
 renderLogs();
+
+// เพิ่มฟังก์ชัน Load/Save LocalStorage
+function saveToLocal() {
+    localStorage.setItem('training_logs', JSON.stringify(logs));
+    localStorage.setItem('log_counter', logCounter.toString());
+}
+
+function loadFromLocal() {
+    const savedLogs = localStorage.getItem('training_logs');
+    const savedCounter = localStorage.getItem('log_counter');
+    if (savedLogs) logs = JSON.parse(savedLogs);
+    if (savedCounter) logCounter = parseInt(savedCounter);
+    renderLogs();
+}
+
+// แล้วเรียกใช้ saveToLocal() ทุกครั้งที่มีการบันทึก, แก้ไข หรือลบข้อมูล
+// และเรียก loadFromLocal() ตอน INIT
